@@ -37,7 +37,7 @@ devtools::install_github("joundso/mainzelliste-connector", ref = "development")
 #### Without setting the environment variables
 
 ```R
-MainzellisteConnectoR::pseudonymize(
+res <- MainzellisteConnectoR::pseudonymize(
   MAINZELLISTE_BASE_URL = "https://your-organization.org",
   MAINZELLISTE_API_KEY = "123456789abcdef",
   MAINZELLISTE_FIELDNAME = "ishid",
@@ -45,6 +45,7 @@ MainzellisteConnectoR::pseudonymize(
 )
 
 ## Result (e.g.):
+res
 #       123        456        abc
 # "000C30WP" "T4ECWT4Q" "Y2FAYH5D"
 ```
@@ -67,12 +68,13 @@ then read in the file and assign all variables to the environment:
 DIZutils::set_env_vars(env_file = "./.env")
 
 ## And use the smaller function call:
-MainzellisteConnectoR::pseudonymize(
+res <- MainzellisteConnectoR::pseudonymize(
   mainzelliste_fieldvalue = c(123, 456, "abc"),
   from_env = TRUE
 )
 
 ## Result (e.g.):
+res
 #       123        456        abc
 # "000C30WP" "T4ECWT4Q" "Y2FAYH5D"
 ```
@@ -81,6 +83,7 @@ MainzellisteConnectoR::pseudonymize(
 
 ```R
 ## Result (e.g.):
+res
 #       123        456        abc
 # "000C30WP" "T4ECWT4Q" "Y2FAYH5D"
 
