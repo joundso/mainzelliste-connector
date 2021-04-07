@@ -32,7 +32,7 @@ my_desc$del("Maintainer")
 my_desc$del("LazyData")
 
 # Set the version
-my_desc$set_version("0.0.1.9001")
+my_desc$set_version("0.0.1.9002")
 
 # The title of your package
 my_desc$set(Title = "Utilities for working with the 'Mainzelliste'")
@@ -41,7 +41,7 @@ my_desc$set(Title = "Utilities for working with the 'Mainzelliste'")
 my_desc$set(
   Description = paste0(
     "Utility functions used for working with the 'Mainzelliste'",
-    " like (de-) pseudonymization of one or mulitple values.",
+    " like (de-) pseudonymization of one or mulitple values."
   )
 )
 
@@ -91,6 +91,9 @@ usethis::use_package("R", min_version = "3.1.0", type = "Depends")
 
 ## Imports
 usethis::use_package("DIZutils", type = "Imports")
+usethis::use_package("httr", type = "Imports")
+usethis::use_package("jsonlite", type = "Imports")
+usethis::use_package("rapportools", type = "Imports")
 
 ## Suggests
 usethis::use_package("testthat", type = "Suggests")
