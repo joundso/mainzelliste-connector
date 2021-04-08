@@ -134,8 +134,9 @@ depseudonymize_single <- function(MAINZELLISTE_BASE_URL,
           body = payload
         )
       # httr::content(response, as = "text")
-      token_id <-
-        jsonlite::fromJSON(httr::content(response, as = "text"))[["tokenId"]]
+      token_id <- jsonlite::fromJSON(httr::content(x = response,
+                                                   as = "text",
+                                                   encoding = "UTF-8"))[["tokenId"]]
     },
     error = function(cond) {
       msg <- "Couldn't create a token_id"
