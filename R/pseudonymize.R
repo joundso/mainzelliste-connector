@@ -103,8 +103,8 @@ pseudonymize_single <- function(MAINZELLISTE_BASE_URL,
     DIZutils::feedback(print_this = msg,
                        type = "Error",
                        findme = "0cf6d9ded8")
-    res[["success"]] = -1
-    res[["error_msg"]] = msg
+    res[["success"]] <- -1
+    res[["error_msg"]] <- msg
   })
 
 
@@ -140,8 +140,8 @@ pseudonymize_single <- function(MAINZELLISTE_BASE_URL,
       DIZutils::feedback(print_this = msg,
                          type = "Error",
                          findme = "f24e7c7425")
-      res[["success"]] = -1
-      res[["error_msg"]] = msg
+      res[["success"]] <- -1
+      res[["error_msg"]] <- msg
     })
   }
 
@@ -171,11 +171,11 @@ pseudonymize_single <- function(MAINZELLISTE_BASE_URL,
       value <- httr::content(response)[["newId"]]
 
       if (nchar(value) > 0) {
-        res[["success"]] = 1
-        res[["value"]] = value
+        res[["success"]] <- 1
+        res[["value"]] <- value
       } else {
-        res[["success"]] = -1
-        res[["error_msg"]] = "The received value is empty"
+        res[["success"]] <- -1
+        res[["error_msg"]] <- "The received value is empty"
       }
     },
     error = function(cond) {
@@ -183,8 +183,8 @@ pseudonymize_single <- function(MAINZELLISTE_BASE_URL,
       DIZutils::feedback(print_this = msg,
                          type = "Error",
                          findme = "08ade930ba")
-      res[["success"]] = -1
-      res[["error_msg"]] = msg
+      res[["success"]] <- -1
+      res[["error_msg"]] <- msg
     })
   }
   if (res[["success"]] == 1) {
