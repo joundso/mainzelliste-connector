@@ -24,20 +24,27 @@
 #' @param MAINZELLISTE_FIELDNAME (Optional, String) The name of
 #'   the field to use for the Mainzelliste. Specified in the ML-config.
 #' @param mainzelliste_fieldvalue (String) The actual value to pseudonymized.
-#' @param from_env (Optional, Boolean, Default = `FALSE`) If true, the
+#' @param from_env (Optional, Boolean, Default = `TRUE`) If true, the
 #'   connection parameters `MAINZELLISTE_BASE_URL`, `MAINZELLISTE_API_KEY` and
 #'   `MAINZELLISTE_FIELDNAME` are read from the environment
 #'   and can therefore be left empty when calling this function.
+#' @param error_is_na (Boolean, optional, default = FALSE) If there is an
+#'   error while creating the pseudonym or while converting the pseudonym to
+#'   a real value, should the result be `NA` instead of an error?
+#' @param skip_na (Boolean, optional, default = TRUE) Should NAs in the input
+#'   data be skipped (the result for them will also be NA)?
 #'
 #' @return (vector) All pseudonyms for the input values.
 #' @export
 #'
 pseudonymize <-
-  function(MAINZELLISTE_BASE_URL = NULL,
+  function(mainzelliste_fieldvalue,
+           MAINZELLISTE_BASE_URL = NULL,
            MAINZELLISTE_API_KEY = NULL,
            MAINZELLISTE_FIELDNAME = NULL,
-           mainzelliste_fieldvalue,
-           from_env = FALSE) {
+           from_env = TRUE,
+           error_is_na = FALSE,
+           skip_na = TRUE) {
     if (from_env) {
       MAINZELLISTE_BASE_URL <- Sys.getenv("MAINZELLISTE_BASE_URL")
       MAINZELLISTE_API_KEY <- Sys.getenv("MAINZELLISTE_API_KEY")
@@ -66,7 +73,9 @@ pseudonymize <-
             MAINZELLISTE_BASE_URL = MAINZELLISTE_BASE_URL,
             MAINZELLISTE_API_KEY = MAINZELLISTE_API_KEY,
             MAINZELLISTE_FIELDNAME = MAINZELLISTE_FIELDNAME,
-            mainzelliste_fieldvalue = x
+            mainzelliste_fieldvalue = x,
+            error_is_na = error_is_na,
+            skip_na = skip_na
           )
         )
       }
@@ -77,7 +86,13 @@ pseudonymize <-
 pseudonymize_single <- function(MAINZELLISTE_BASE_URL,
                                 MAINZELLISTE_API_KEY,
                                 MAINZELLISTE_FIELDNAME,
-                                mainzelliste_fieldvalue) {
+                                mainzelliste_fieldvalue,
+                                error_is_na,
+                                skip_na) {
+  if (skip_na && is.na(mainzelliste_fieldvalue)) {
+    return(NA)
+  }
+
   ## Remove last '/':
   MAINZELLISTE_BASE_URL <-
     DIZutils::clean_path_name(pathname = MAINZELLISTE_BASE_URL, remove.slash = TRUE)
@@ -190,16 +205,25 @@ pseudonymize_single <- function(MAINZELLISTE_BASE_URL,
   if (res[["success"]] == 1) {
     return(res[["value"]])
   } else {
+    if (error_is_na) {
+      type = "Warning"
+    } else {
+      type = "Error"
+    }
     DIZutils::feedback(
       print_this = paste0(
-        "Error while pseudonymizing '",
+        "Couldn't pseudonymize '",
         mainzelliste_fieldvalue,
         "'",
         res[["error_msg"]]
       ),
-      type = "Error",
+      type = type,
       findme = "6057e877e5"
     )
-    stop("See error above")
+    if (error_is_na) {
+      return(NA)
+    } else {
+      stop("See error above")
+    }
   }
 }

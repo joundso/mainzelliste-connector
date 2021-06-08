@@ -23,11 +23,13 @@
 #' @export
 #'
 depseudonymize <-
-  function(MAINZELLISTE_BASE_URL = NULL,
+  function(mainzelliste_fieldvalue,
+           MAINZELLISTE_BASE_URL = NULL,
            MAINZELLISTE_API_KEY = NULL,
            MAINZELLISTE_FIELDNAME = NULL,
-           mainzelliste_fieldvalue,
-           from_env = FALSE) {
+           from_env = TRUE,
+           error_is_na = FALSE,
+           skip_na = TRUE) {
     if (from_env) {
       MAINZELLISTE_BASE_URL <- Sys.getenv("MAINZELLISTE_BASE_URL")
       MAINZELLISTE_API_KEY <- Sys.getenv("MAINZELLISTE_API_KEY")
@@ -56,7 +58,9 @@ depseudonymize <-
             MAINZELLISTE_BASE_URL = MAINZELLISTE_BASE_URL,
             MAINZELLISTE_API_KEY = MAINZELLISTE_API_KEY,
             MAINZELLISTE_FIELDNAME = MAINZELLISTE_FIELDNAME,
-            mainzelliste_fieldvalue = x
+            mainzelliste_fieldvalue = x,
+            error_is_na = error_is_na,
+            skip_na = skip_na
           )
         )
       }
@@ -68,7 +72,13 @@ depseudonymize <-
 depseudonymize_single <- function(MAINZELLISTE_BASE_URL,
                                   MAINZELLISTE_API_KEY,
                                   MAINZELLISTE_FIELDNAME,
-                                  mainzelliste_fieldvalue) {
+                                  mainzelliste_fieldvalue,
+                                  error_is_na,
+                                  skip_na) {
+  if (skip_na && is.na(mainzelliste_fieldvalue)) {
+    return(NA)
+  }
+
   ## Remove last '/':
   MAINZELLISTE_BASE_URL <-
     DIZutils::clean_path_name(pathname = MAINZELLISTE_BASE_URL, remove.slash = TRUE)
@@ -134,9 +144,11 @@ depseudonymize_single <- function(MAINZELLISTE_BASE_URL,
           body = payload
         )
       # httr::content(response, as = "text")
-      token_id <- jsonlite::fromJSON(httr::content(x = response,
-                                                   as = "text",
-                                                   encoding = "UTF-8"))[["tokenId"]]
+      token_id <- jsonlite::fromJSON(httr::content(
+        x = response,
+        as = "text",
+        encoding = "UTF-8"
+      ))[["tokenId"]]
     },
     error = function(cond) {
       msg <- "Couldn't create a token_id"
@@ -181,16 +193,25 @@ depseudonymize_single <- function(MAINZELLISTE_BASE_URL,
   if (res[["success"]] == 1) {
     return(res[["value"]])
   } else {
+    if (error_is_na) {
+      type = "Warning"
+    } else {
+      type = "Error"
+    }
     DIZutils::feedback(
       print_this = paste0(
-        "Error while depseudonymizing '",
+        "Couldn't depseudonymize '",
         mainzelliste_fieldvalue,
         "': ",
         res[["error_msg"]]
       ),
-      type = "Error",
+      type = type,
       findme = "fbccd250bc"
     )
-    stop("See error above")
+    if (error_is_na) {
+      return(NA)
+    } else {
+      stop("See error above")
+    }
   }
 }
